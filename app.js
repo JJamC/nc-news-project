@@ -1,6 +1,8 @@
 const express = require('express')
 const app = express()
-const { sendTopics } = require('./controller/nc-news-controller')
+const { sendTopics, sendEndpoints } = require('./controller/nc-news-controller')
+
+app.get("/api", sendEndpoints)
 
 app.get("/api/topics", sendTopics)
 
