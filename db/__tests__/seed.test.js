@@ -3,6 +3,7 @@ const db = require('../connection')
 const testData = require('../data/test-data')
 const seed = require('../seeds/seed')
 const app = require('../../app')
+const endPoints = require('../../endpoints.json')
 
 beforeEach(() => seed(testData));
 
@@ -23,7 +24,7 @@ test('GET 200: response contains all topics', () => {
             })
         })
         })
-    })
+ })
 test('GET 404: user enters invalid endpoint', () => {
     return request(app)
     .get("/api/tropicz")
@@ -34,3 +35,14 @@ test('GET 404: user enters invalid endpoint', () => {
     })
 })
 });
+
+describe('/api', () => {
+test("GET 200: responds with an object of endpoints", () => {
+    return request(app)
+    .get("/api")
+    .expect(200)
+    .then(( { body } ) => {
+        expect(body).toEqual(endPoints)
+    })
+})
+})
