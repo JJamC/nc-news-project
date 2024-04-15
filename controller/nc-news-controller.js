@@ -1,4 +1,4 @@
-const { fetchTopics } = require('../model/nc-news-models')
+const { fetchTopics, fetchArticle } = require('../model/nc-news-models')
 const endPoints = require('../endpoints.json')
 
 function sendEndpoints(req, res, next) {
@@ -11,5 +11,12 @@ function sendTopics(req, res, next) {
     }).catch(next)
 }
 
+function sendArticle(req , res, next) {
+    const { article_id } = req.params
+    return fetchArticle(article_id).then((article) =>{
+        res.status(200).send( article )
+    }).catch(next)
+}
 
-module.exports = { sendTopics, sendEndpoints }
+
+module.exports = { sendTopics, sendEndpoints, sendArticle }
