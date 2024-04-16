@@ -1,4 +1,4 @@
-const { fetchTopics, fetchArticle, fetchAllArticles } = require('../model/nc-news-models')
+const { fetchTopics, fetchArticle, fetchAllArticles, fetchArticleComments, checkArticleExists } = require('../model/nc-news-models')
 const endPoints = require('../endpoints.json')
 
 function sendEndpoints(req, res, next) {
@@ -24,5 +24,15 @@ function sendAllArticles(req, res, next) {
     }).catch(next)
 }
 
+function sendArticleComments(req, res, next) {
+    const { article_id } = req.params
+    Promise.all([fetchArticleComments(article_id), checkArticleExists(article_id)])
+    .then((arr) => {
+        res.status(200).send( { comments: arr[0] }  )
+    }).catch(next)
+  
 
-module.exports = { sendTopics, sendEndpoints, sendArticle, sendAllArticles }
+}
+
+
+module.exports = { sendTopics, sendEndpoints, sendArticle, sendAllArticles, sendArticleComments }
