@@ -20,7 +20,7 @@ function sendArticle(req , res, next) {
 
 function sendAllArticles(req, res, next) {
     return fetchAllArticles().then((articles) =>{
-        res.status(200).send( { articles })
+        res.status(200).send( { articles } )
     }).catch(next)
 }
 

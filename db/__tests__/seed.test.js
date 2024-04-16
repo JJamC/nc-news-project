@@ -89,22 +89,21 @@ test('GET 400: responds with 400 error message if id is entered in an invalid fo
     })
 })
 
-xdescribe('/api/articles', () => {
-test('GET 200: responds with array of article objects', () => {
+describe('/api/articles', () => {
+test('GET 200: responds with array of article objects in descending order', () => {
     return request(app)
     .get('/api/articles')
     .expect(200)
     .then(({ body }) => {
         const { articles } = body
         expect(articles.length).toBe(13)
-        console.log(articles);
+        expect(articles).toBeSortedBy('created_at',{ descending: true })
         articles.forEach((article) => {
             expect(article).toMatchObject(expect.objectContaining({
                 article_id: expect.any(Number),
                 title: expect.any(String),
                 topic: expect.any(String),
                 author: expect.any(String),
-                body: expect.any(String),
                 created_at: expect.any(String),
                 votes: expect.any(Number),
                 article_img_url: expect.any(String),
@@ -113,10 +112,5 @@ test('GET 200: responds with array of article objects', () => {
         })
     })
 })
-// test('', () => {
-//     .get('/api/')
-//     .expect()
-//     .then(({ body }) => {
-//         })
-//     });
+
 })
