@@ -10,4 +10,4 @@ This way you can also run the seed with test data via jest or you can run the se
 
 -- Install npm express for the app file
 
--- Install jest supertest to run the seed.test.js file
+-- Install jest supertest, jest-sorted to run the seed.test.js file

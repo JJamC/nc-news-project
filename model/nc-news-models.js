@@ -26,17 +26,24 @@ function fetchArticle(article_id) {
 }
 
 function fetchAllArticles() {
-    const articleQuery = db.query(`SELECT * FROM articles`)
+    const articleQuery = db.query(`SELECT * FROM articles ORDER BY created_at DESC`)
     const commentQuery = db.query(`SELECT * FROM comments`)
     return Promise.all([articleQuery, commentQuery])
     .then(( arr ) => {
         const articles = arr[0].rows
         const comments = arr[1].rows
 
-        comments.forEach((comment) => {
-            
+        articles.forEach((article) => {
+            let commentCount = 0
+            comments.forEach((comment => {
+                if(article.article_id === comment.article_id) {
+                    commentCount ++
+                }
+            }))
+            article.comment_count = commentCount
+            delete article.body
         })
-        console.log(comments);
+        return articles
     })
 }
 
