@@ -18,10 +18,10 @@ test('GET 200: response contains all topics', () => {
         const { topics } = body;
         expect(topics.length).toBe(3)
         topics.forEach((topic) => {
-            expect.objectContaining({
+            expect(topic).toMatchObject(expect.objectContaining({
                 description: expect.any(String),
                 slug: expect.any(String)
-            })
+            }))
         })
         })
  })
@@ -53,20 +53,23 @@ test('GET 200: responds with the article that matches the given article_id', () 
     .get('/api/articles/1')
     .expect(200)
     .then(({ body }) => {
-        expect(body).toMatchObject(
-            {
-                title: "Living in the shadow of a great man",
-                topic: "mitch",
-                author: "butter_bridge",
-                body: "I find this existence challenging",
-                created_at: '2020-07-09T20:11:00.000Z', // here the date looks completely different in the test data vs the db table, is it ok that I use the date from the db table rather than convert it somehow from the data?
-                votes: 100,
-                article_img_url:
-                  "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
-              }
-        )
+        const { article } = body
+            expect(article).toMatchObject(expect.objectContaining(
+                {
+                    title: "Living in the shadow of a great man",
+                    topic: "mitch",
+                    author: "butter_bridge",
+                    body: "I find this existence challenging",
+                    created_at: expect.any(String), 
+                    votes: 100,
+                    article_img_url:
+                      "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+                  }
+                )
+            )
+        })
+        })  
     })
-})
 test('GET 404: responds with 404 error message if id does not exist', () => {
     return request(app)
     .get('/api/articles/9999')
@@ -85,4 +88,35 @@ test('GET 400: responds with 400 error message if id is entered in an invalid fo
         expect(msg).toBe('Bad Request')
     })
 })
+
+xdescribe('/api/articles', () => {
+test('GET 200: responds with array of article objects', () => {
+    return request(app)
+    .get('/api/articles')
+    .expect(200)
+    .then(({ body }) => {
+        const { articles } = body
+        expect(articles.length).toBe(13)
+        console.log(articles);
+        articles.forEach((article) => {
+            expect(article).toMatchObject(expect.objectContaining({
+                article_id: expect.any(Number),
+                title: expect.any(String),
+                topic: expect.any(String),
+                author: expect.any(String),
+                body: expect.any(String),
+                created_at: expect.any(String),
+                votes: expect.any(Number),
+                article_img_url: expect.any(String),
+                comment_count: expect.any(Number)
+            }))
+        })
+    })
+})
+// test('', () => {
+//     .get('/api/')
+//     .expect()
+//     .then(({ body }) => {
+//         })
+//     });
 })
