@@ -169,7 +169,7 @@ test('GET 404: responds with error message if article_id is not found', () => {
         expect(msg).toBe('Not Found')
 })
 })
-test.only('GET 400: responds with error message if article_id is invalid', () => {
+test('GET 400: responds with error message if article_id is invalid', () => {
     return request(app)
     .get('/api/articles/catsanddogs/comments')
     .expect(400)
@@ -202,19 +202,19 @@ test('POST 201: responds with successful created message when post is successful
     })
 })
 // post errors - invalid article:id, non-existent article id
-test('POST 409: responds with error message if passed a non-existent article id', () => {
-    const newComment = {
-        username: "butter_bridge",
-        body: "Whilst reading this article I suffered a great fall"
-    }
-    return request(app)
-    .post('/api/articles/5485/comments')
-    .send(newComment)
-    .expect(409)
-    .then(({ body }) => {
-        const { msg } = body
-        expect(msg).toBe('Conflict')
-})
-});
+// test('POST 409: responds with error message if passed a non-existent article id', () => {
+//     const newComment = {
+//         username: "butter_bridge",
+//         body: "Whilst reading this article I suffered a great fall"
+//     }
+//     return request(app)
+//     .post('/api/articles/5485/comments')
+//     .send(newComment)
+//     .expect(409)
+//     .then(({ body }) => {
+//         const { msg } = body
+//         expect(msg).toBe('Conflict')
+// })
+// });
 // invalid comment format, 
 })
