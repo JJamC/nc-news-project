@@ -87,7 +87,7 @@ test('GET 400: responds with 400 error message if id is entered in an invalid fo
         expect(msg).toBe('Bad Request')
     })
 })
-test('PATCH 200: updates votes key of article and returns updated article', () => {
+test('PATCH 200: updates votes key of article by adding a positive integer and returns updated article', () => {
     return request(app)
     .patch('/api/articles/1')
     .send({ inc_votes: 1 })
@@ -101,7 +101,29 @@ test('PATCH 200: updates votes key of article and returns updated article', () =
                     author: "butter_bridge",
                     body: "I find this existence challenging",
                     created_at: expect.any(String), 
-                    votes: 101, //updated vote
+                    votes: 101,
+                    article_img_url:
+                      "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+                  }
+                )
+            )
+        })
+});
+test('PATCH 200: updates votes key of article by adding a negative integer and returns updated article', () => {
+    return request(app)
+    .patch('/api/articles/1')
+    .send({ inc_votes: -50 })
+    .expect(200)
+    .then(({ body }) => {
+        const { article } = body
+            expect(article).toMatchObject(expect.objectContaining(
+                {
+                    title: "Living in the shadow of a great man",
+                    topic: "mitch",
+                    author: "butter_bridge",
+                    body: "I find this existence challenging",
+                    created_at: expect.any(String), 
+                    votes: 50,
                     article_img_url:
                       "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
                   }
@@ -299,4 +321,16 @@ test('POST 400: responds with error message if passed an invalid article id', ()
 })
 });
 
+})
+describe('/api/comments/:comment_id', () => {
+test('DELETE 204: deletes comment given in comment id', () => {
+    return request(app)
+    .delete('/api/comments/2')
+    .expect(204)
+})
+test('DELETE 400: responds with error message when comment_id is invalid', () => {
+    return request(app)
+    .delete('/api/comments/fdsa')
+    .expect(400)
+})
 })

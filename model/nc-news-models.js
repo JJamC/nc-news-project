@@ -97,4 +97,8 @@ function updateArticle(voteUpdate, article_id) {
     })
 }
 
-module.exports = { fetchTopics, fetchArticle, fetchAllArticles, fetchArticleComments, checkArticleExists, insertComment, updateArticle }
+function deleteComment(comment_id) {
+    return db.query(`DELETE FROM comments WHERE comment_id=$1`, [comment_id])
+}
+
+module.exports = { fetchTopics, fetchArticle, fetchAllArticles, fetchArticleComments, checkArticleExists, insertComment, updateArticle, deleteComment }
