@@ -21,6 +21,13 @@ app.all('*', (req, res, next) => {
 })
 
 app.use((err, req, res, next) => {
+    if (err.code === '23503' || err.code === '22P02') {
+        res.status(400).send({ msg: 'Bad Request'})
+    }
+    next(err)
+})
+
+app.use((err, req, res, next) => {
     if(err.status && err.msg) {
         res.status(err.status).send({ msg: err.msg})
     }

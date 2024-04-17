@@ -178,7 +178,6 @@ test('GET 400: responds with error message if article_id is invalid', () => {
         expect(msg).toBe('Bad Request')
 })
 })
-
 test('POST 201: responds with successful created message when post is successfully made', () => {
     const newComment = {
         username: "butter_bridge",
@@ -201,20 +200,59 @@ test('POST 201: responds with successful created message when post is successful
     })
     })
 })
-// post errors - invalid article:id, non-existent article id
-// test('POST 409: responds with error message if passed a non-existent article id', () => {
-//     const newComment = {
-//         username: "butter_bridge",
-//         body: "Whilst reading this article I suffered a great fall"
-//     }
-//     return request(app)
-//     .post('/api/articles/5485/comments')
-//     .send(newComment)
-//     .expect(409)
-//     .then(({ body }) => {
-//         const { msg } = body
-//         expect(msg).toBe('Conflict')
-// })
-// });
-// invalid comment format, 
+test('POST 400: responds with error message if passed a non-existent article id', () => {
+    const newComment = {
+        username: "butter_bridge",
+        body: "Whilst reading this article I suffered a great fall"
+    }
+    return request(app)
+    .post('/api/articles/5485/comments')
+    .send(newComment)
+    .expect(400)
+    .then(({ body }) => {
+        const { msg } = body
+        expect(msg).toBe('Bad Request')
+})
+});
+test('POST 400: responds with error message if passed an invalid article id', () => {
+    const newComment = {
+        username: "butter_bridge",
+        body: "Whilst reading this article I suffered a great fall"
+    }
+    return request(app)
+    .post('/api/articles/woohoo/comments')
+    .send(newComment)
+    .expect(400)
+    .then(({ body }) => {
+        const { msg } = body
+        expect(msg).toBe('Bad Request')
+})
+});
+test('POST 400: responds with error message if passed an invalid article id', () => {
+    const newComment = {
+        comment: 'Lovely article'
+    }
+    return request(app)
+    .post('/api/articles/woohoo/comments')
+    .send(newComment)
+    .expect(400)
+    .then(({ body }) => {
+        const { msg } = body
+        expect(msg).toBe('Bad Request')
+})
+});
+test('POST 400: responds with error message if passed an invalid article id', () => {
+    const newComment = {
+        username: "nowhere_man",
+        body: "Whilst reading this article I suffered a great fall"
+    }
+    return request(app)
+    .post('/api/articles/2/comments')
+    .send(newComment)
+    .expect(400)
+    .then(({ body }) => {
+        const { msg } = body
+        expect(msg).toBe('Bad Request')
+})
+});
 })
