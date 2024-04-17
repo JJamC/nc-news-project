@@ -25,7 +25,7 @@ test('GET 200: response contains all topics', () => {
         })
         })
  })
-test('GET 404: responds with a 404 error message wgen user enters invalid endpoint', () => {
+test('GET 404: responds with a 404 error message when user enters invalid endpoint', () => {
     return request(app)
     .get('/api/tropicz')
     .expect(404)
@@ -90,14 +90,13 @@ test('GET 400: responds with 400 error message if id is entered in an invalid fo
 })
 
 describe('/api/articles', () => {
-test('GET 200: responds with array of article objects in descending order', () => {
+test('GET 200: responds with array of article objects', () => {
     return request(app)
     .get('/api/articles')
     .expect(200)
     .then(({ body }) => {
         const { articles } = body
         expect(articles.length).toBe(13)
-        expect(articles).toBeSortedBy('created_at',{ descending: true })
         articles.forEach((article) => {
             expect(article).toMatchObject(expect.objectContaining({
                 article_id: expect.any(Number),
@@ -112,5 +111,110 @@ test('GET 200: responds with array of article objects in descending order', () =
         })
     })
 })
+test('GET 200: responds with array of article objects in descending order', () => {
+    return request(app)
+    .get('/api/articles')
+    .expect(200)
+    .then(({ body }) => {
+        const { articles } = body
+        expect(articles).toBeSortedBy('created_at',{ descending: true })
+    })
+})
+})
 
+describe('/api/articles/:article_id/comments', () => {
+test('GET 200: responds with an array of comments for the given article_id', () => {
+    return request(app)
+    .get('/api/articles/1/comments')
+    .expect(200)
+    .then(({ body }) => {
+    const { comments } = body
+    expect(comments.length).toBe(11)
+    comments.forEach((comment) => {
+        expect(comment).toMatchObject(expect.objectContaining({
+            comment_id: expect.any(Number),
+            votes: expect.any(Number),
+            created_at: expect.any(String),
+            author: expect.any(String),
+            body: expect.any(String),
+            article_id: 1
+            }))
+        })
+    })
+})
+test('GET 200: responds with array of comments from most recent to least recent', () => {
+    return request(app)
+    .get('/api/articles/1/comments')
+    .expect(200)
+    .then(({ body }) => {
+        const { comments } = body
+        expect(comments).toBeSortedBy('created_at',{ descending: true })
+    })
+})
+test('GET 200: responds with an empty array if article_id is valid but has no comments', () => {
+    return request(app)
+    .get('/api/articles/10/comments')
+    .expect(200)
+.   then(({ body }) => {
+    const { comments } = body
+        expect(comments.length).toBe(0)
+})
+})
+test('GET 404: responds with error message if article_id is not found', () => {
+    return request(app)
+    .get('/api/articles/437/comments')
+    .expect(404)
+    .then(( { body } ) => {
+        const { msg } = body
+        expect(msg).toBe('Not Found')
+})
+})
+test('GET 400: responds with error message if article_id is invalid', () => {
+    return request(app)
+    .get('/api/articles/catsanddogs/comments')
+    .expect(400)
+    .then(( { body } ) => {
+        const { msg } = body
+        expect(msg).toBe('Bad Request')
+})
+})
+
+test('POST 201: responds with successful created message when post is successfully made', () => {
+    const newComment = {
+        username: "butter_bridge",
+        body: "Whilst reading this article I suffered a great fall"
+    }
+    return request(app)
+    .post('/api/articles/2/comments')
+    .send(newComment)
+    .expect(201)
+    .then(({ body }) => {
+        const { comment } = body
+        expect(comment).toMatchObject({
+            comment_id: expect.any(Number),
+            votes: expect.any(Number),
+            created_at: expect.any(String),
+            author: expect.any(String),
+            body: expect.any(String),
+            article_id: 2,
+            body: "Whilst reading this article I suffered a great fall"
+    })
+    })
+})
+// post errors - invalid article:id, non-existent article id
+// test('POST 409: responds with error message if passed a non-existent article id', () => {
+//     const newComment = {
+//         username: "butter_bridge",
+//         body: "Whilst reading this article I suffered a great fall"
+//     }
+//     return request(app)
+//     .post('/api/articles/5485/comments')
+//     .send(newComment)
+//     .expect(409)
+//     .then(({ body }) => {
+//         const { msg } = body
+//         expect(msg).toBe('Conflict')
+// })
+// });
+// invalid comment format, 
 })
