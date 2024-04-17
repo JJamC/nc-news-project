@@ -69,7 +69,6 @@ test('GET 200: responds with the article that matches the given article_id', () 
             )
         })
         })  
-    })
 test('GET 404: responds with 404 error message if id does not exist', () => {
     return request(app)
     .get('/api/articles/9999')
@@ -87,6 +86,50 @@ test('GET 400: responds with 400 error message if id is entered in an invalid fo
         const { msg } = body
         expect(msg).toBe('Bad Request')
     })
+})
+test('PATCH 200: updates votes key of article and returns updated article', () => {
+    return request(app)
+    .patch('/api/articles/1')
+    .send({ inc_votes: 1 })
+    .expect(200)
+    .then(({ body }) => {
+        const { article } = body
+            expect(article).toMatchObject(expect.objectContaining(
+                {
+                    title: "Living in the shadow of a great man",
+                    topic: "mitch",
+                    author: "butter_bridge",
+                    body: "I find this existence challenging",
+                    created_at: expect.any(String), 
+                    votes: 101, //updated vote
+                    article_img_url:
+                      "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+                  }
+                )
+            )
+        })
+});
+test('PATCH 400: returns error given invalid body', () => {
+    return request(app)
+    .patch('/api/articles/1')
+    .send({})
+    .expect(400)
+    .then(({ body }) => {
+        const { msg } = body
+            expect(msg).toBe('Bad Request')
+});
+})
+
+test('PATCH 400: returns error if article does not exist', () => {
+    return request(app)
+    .patch('/api/articles/100')
+    .send({ inc_votes: 1 })
+    .expect(400)
+    .then(({ body }) => {
+        const { msg } = body
+            expect(msg).toBe('Bad Request')
+});
+})
 })
 
 describe('/api/articles', () => {
@@ -255,4 +298,5 @@ test('POST 400: responds with error message if passed an invalid article id', ()
         expect(msg).toBe('Bad Request')
 })
 });
+
 })

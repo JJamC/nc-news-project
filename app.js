@@ -1,6 +1,8 @@
 const express = require('express')
 const app = express()
-const { sendTopics, sendEndpoints, sendArticle, sendAllArticles, sendArticleComments, postCommentById } = require('./controller/nc-news-controller')
+const { sendTopics, sendEndpoints, sendArticle, sendAllArticles, sendArticleComments, postCommentById, patchArticle } = require('./controller/nc-news-controller')
+
+app.use(express.json())
 
 app.get("/api", sendEndpoints)
 
@@ -12,7 +14,7 @@ app.get('/api/articles', sendAllArticles)
 
 app.get('/api/articles/:article_id/comments', sendArticleComments)
 
-app.use(express.json())
+app.patch('/api/articles/:article_id', patchArticle)
 
 app.post('/api/articles/:article_id/comments', postCommentById)
 

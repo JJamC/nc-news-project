@@ -80,4 +80,21 @@ function insertComment(article_id, body) {
     })
 }
 
-module.exports = { fetchTopics, fetchArticle, fetchAllArticles, fetchArticleComments, checkArticleExists, insertComment }
+function updateArticle(voteUpdate, article_id) {  
+    if(!voteUpdate) {
+        return Promise.reject({status: 400, msg: 'Bad Request'})
+    }
+    return db.query(`UPDATE articles
+    SET
+      votes= votes + $1
+    WHERE article_id=$2
+    RETURNING *;`, [voteUpdate, article_id])
+    .then(({ rows }) => {
+        if(!rows.length) {
+            return Promise.reject({status: 400, msg: 'Bad Request'})
+        }
+        return rows[0]
+    })
+}
+
+module.exports = { fetchTopics, fetchArticle, fetchAllArticles, fetchArticleComments, checkArticleExists, insertComment, updateArticle }
