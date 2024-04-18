@@ -1,4 +1,4 @@
-const { fetchTopics, fetchArticle, fetchAllArticles, fetchArticleComments, checkArticleExists, insertComment, updateArticle, deleteComment } = require('../model/nc-news-models')
+const { fetchTopics, fetchArticle, fetchAllArticles, fetchArticleComments, checkArticleExists, insertComment, updateArticle, deleteComment, fetchUsers } = require('../model/nc-news-models')
 const endPoints = require('../endpoints.json')
 
 function sendEndpoints(req, res, next) {
@@ -62,4 +62,11 @@ function sendDelete(req, res, next) {
     }).catch(next)
 }
 
-module.exports = { sendTopics, sendEndpoints, sendArticle, sendAllArticles, sendArticleComments, postCommentById, patchArticle, sendDelete}
+function sendUsers(req, res, next) {
+    fetchUsers()
+    .then((users) => {
+        res.status(200).send({ users })
+    }).catch(next)
+}
+
+module.exports = { sendTopics, sendEndpoints, sendArticle, sendAllArticles, sendArticleComments, postCommentById, patchArticle, sendDelete, sendUsers}

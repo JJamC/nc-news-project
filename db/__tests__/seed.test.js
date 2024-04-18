@@ -31,7 +31,7 @@ test('GET 404: responds with a 404 error message when user enters invalid endpoi
     .expect(404)
     .then(({ body }) => {
         const { msg } = body
-        expect(msg).toBe('Not Found')
+        expect(msg).toBe('Endpoint Not Found')
     })
 })
 });
@@ -293,20 +293,8 @@ test('POST 400: responds with error message if passed an invalid article id', ()
         expect(msg).toBe('Bad Request')
 })
 });
-test('POST 400: responds with error message if passed an invalid article id', () => {
-    const newComment = {
-        comment: 'Lovely article'
-    }
-    return request(app)
-    .post('/api/articles/woohoo/comments')
-    .send(newComment)
-    .expect(400)
-    .then(({ body }) => {
-        const { msg } = body
-        expect(msg).toBe('Bad Request')
-})
-});
-test('POST 400: responds with error message if passed an invalid article id', () => {
+
+test('POST 400: responds with error message if passed an invalid username', () => {
     const newComment = {
         username: "nowhere_man",
         body: "Whilst reading this article I suffered a great fall"
@@ -333,4 +321,31 @@ test('DELETE 400: responds with error message when comment_id is invalid', () =>
     .delete('/api/comments/fdsa')
     .expect(400)
 })
+})
+describe.only('/api/users', () => {
+test('GET 200: responds with array of users', () => {
+    return request(app)
+    .get('/api/users')
+    .expect(200)
+    .then(({ body }) => {
+    const { users } = body
+    users.forEach((user) => {
+        expect(user).toMatchObject({
+            username: expect.any(String),
+            name: expect.any(String),
+            avatar_url: expect.any(String)
+        }
+        )
+    })
+})
+});
+test('GET 404: responds with bad request if endpoint is invalid', () => {
+    return request(app)
+    .get('/api/usersss')
+    .expect(404)
+    .then(({ body }) => {
+    const { msg } = body
+    expect(msg).toBe('Endpoint Not Found')
+})
+});
 })

@@ -1,6 +1,6 @@
 const express = require('express')
 const app = express()
-const { sendTopics, sendEndpoints, sendArticle, sendAllArticles, sendArticleComments, postCommentById, patchArticle, sendDelete } = require('./controller/nc-news-controller')
+const { sendTopics, sendEndpoints, sendArticle, sendAllArticles, sendArticleComments, postCommentById, patchArticle, sendDelete, sendUsers } = require('./controller/nc-news-controller')
 
 app.use(express.json())
 
@@ -9,6 +9,8 @@ app.get("/api", sendEndpoints)
 app.get("/api/topics", sendTopics)
 
 app.get('/api/articles', sendAllArticles)
+
+app.get('/api/users', sendUsers)
 
 app.get('/api/articles/:article_id', sendArticle)
 
@@ -21,7 +23,7 @@ app.post('/api/articles/:article_id/comments', postCommentById)
 app.delete('/api/comments/:comment_id', sendDelete)
 
 app.all('*', (req, res, next) => {
-    res.status(404).send({ msg: 'Not Found'})
+    res.status(404).send({ msg: 'Endpoint Not Found'})
 })
 
 app.use((err, req, res, next) => {

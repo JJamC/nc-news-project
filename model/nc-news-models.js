@@ -101,4 +101,11 @@ function deleteComment(comment_id) {
     return db.query(`DELETE FROM comments WHERE comment_id=$1`, [comment_id])
 }
 
-module.exports = { fetchTopics, fetchArticle, fetchAllArticles, fetchArticleComments, checkArticleExists, insertComment, updateArticle, deleteComment }
+function fetchUsers() {
+    return db.query(`SELECT * FROM users`)
+    .then(({ rows }) => {
+        return rows
+    })
+}
+
+module.exports = { fetchTopics, fetchArticle, fetchAllArticles, fetchArticleComments, checkArticleExists, insertComment, updateArticle, deleteComment, fetchUsers }
