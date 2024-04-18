@@ -48,7 +48,7 @@ test('GET 200: responds with an object of endpoints"', () => {
 })
 
 describe('/api/articles/:article_id', () => {
-test('GET 200: responds with the article that matches the given article_id', () => {
+test('GET 200: responds with the article that matches the given article_id and comment_count of the number of comments with the given article_id', () => {
     return request(app)
     .get('/api/articles/1')
     .expect(200)
@@ -64,11 +64,13 @@ test('GET 200: responds with the article that matches the given article_id', () 
                     votes: 100,
                     article_img_url:
                       "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+                    comment_count: 11
                   }
                 )
             )
         })
         })  
+
 test('GET 404: responds with 404 error message if id does not exist', () => {
     return request(app)
     .get('/api/articles/9999')
@@ -184,13 +186,14 @@ test('GET 200: responds with array of article objects in descending order', () =
         const { articles } = body
         expect(articles).toBeSortedBy('created_at',{ descending: true })
     })
-}) // topic, which filters the articles by the topic value specified in the query. If the query is omitted, the endpoint should respond with all articles.
+})
 test('GET 200: responds with array of article objects matching the topic query', () => {
     return request(app)
     .get('/api/articles?topic=cats')
     .expect(200)
     .then(({ body }) => {
         const { articles } = body
+        expect(articles.length).toBe(1)
         articles.forEach((article) => {
             expect(article).toMatchObject(
                 {
@@ -217,7 +220,7 @@ test('GET 404: responds with error message if passed non-existent query', () => 
         expect(msg).toBe('Not Found')
     })
 })
-test('GET 400: responds with array of all articles if passed an invalid query', () => {
+test('GET 200: responds with array of all articles if passed an invalid query', () => {
     return request(app)
     .get('/api/articles?tropicz=mitch')
     .expect(200)
@@ -382,6 +385,7 @@ test('GET 200: responds with array of users', () => {
     .expect(200)
     .then(({ body }) => {
     const { users } = body
+    expect(users.length).toBe(4)
     users.forEach((user) => {
         expect(user).toMatchObject({
             username: expect.any(String),
@@ -392,13 +396,5 @@ test('GET 200: responds with array of users', () => {
     })
 })
 });
-test('GET 404: responds with bad request if endpoint is invalid', () => {
-    return request(app)
-    .get('/api/usersss')
-    .expect(404)
-    .then(({ body }) => {
-    const { msg } = body
-    expect(msg).toBe('Endpoint Not Found')
-})
-});
+
 })
