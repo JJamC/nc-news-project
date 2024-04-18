@@ -184,6 +184,59 @@ test('GET 200: responds with array of article objects in descending order', () =
         const { articles } = body
         expect(articles).toBeSortedBy('created_at',{ descending: true })
     })
+}) // topic, which filters the articles by the topic value specified in the query. If the query is omitted, the endpoint should respond with all articles.
+test('GET 200: responds with array of article objects matching the topic query', () => {
+    return request(app)
+    .get('/api/articles?topic=cats')
+    .expect(200)
+    .then(({ body }) => {
+        const { articles } = body
+        articles.forEach((article) => {
+            expect(article).toMatchObject(
+                {
+                    article_id: expect.any(Number),
+                    title: "UNCOVERED: catspiracy to bring down democracy",
+                    topic: "cats",
+                    author: "rogersop",
+                    created_at: expect.any(String),
+                    votes: expect.any(Number),
+                    article_img_url:
+                      "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+                    comment_count: expect.any(Number)
+                  }
+            )
+        })
+    })
+})
+test('GET 404: responds with error message if passed non-existent query', () => {
+    return request(app)
+    .get('/api/articles?topic=dogs')
+    .expect(404)
+    .then(({ body }) => {
+        const { msg } = body
+        expect(msg).toBe('Not Found')
+    })
+})
+test('GET 400: responds with array of all articles if passed an invalid query', () => {
+    return request(app)
+    .get('/api/articles?tropicz=mitch')
+    .expect(200)
+    .then(({ body }) => {
+        const { articles } = body
+        expect(articles.length).toBe(13)
+        articles.forEach((article) => {
+            expect(article).toMatchObject(expect.objectContaining({
+                article_id: expect.any(Number),
+                title: expect.any(String),
+                topic: expect.any(String),
+                author: expect.any(String),
+                created_at: expect.any(String),
+                votes: expect.any(Number),
+                article_img_url: expect.any(String),
+                comment_count: expect.any(Number)
+            }))
+        })
+    })
 })
 })
 
@@ -322,7 +375,7 @@ test('DELETE 400: responds with error message when comment_id is invalid', () =>
     .expect(400)
 })
 })
-describe.only('/api/users', () => {
+describe('/api/users', () => {
 test('GET 200: responds with array of users', () => {
     return request(app)
     .get('/api/users')

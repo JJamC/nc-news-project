@@ -19,7 +19,8 @@ function sendArticle(req , res, next) {
 }
 
 function sendAllArticles(req, res, next) {
-    return fetchAllArticles().then((articles) =>{
+    const { topic } = req.query
+    return fetchAllArticles(topic).then((articles) =>{
         res.status(200).send( { articles } )
     }).catch(next)
 }
