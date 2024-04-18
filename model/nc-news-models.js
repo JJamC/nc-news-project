@@ -25,13 +25,24 @@ function fetchArticle(article_id) {
     })
 }
 
-function fetchAllArticles() {
-    const articleQuery = db.query(`SELECT * FROM articles ORDER BY created_at DESC`)
+function fetchAllArticles(topic) {
+    
+    let articleQuery = db.query(`SELECT * FROM articles ORDER BY created_at DESC`)
     const commentQuery = db.query(`SELECT * FROM comments`)
+
+    if (topic) {
+        articleQuery = db.query(`SELECT * FROM articles WHERE topic=$1 ORDER BY created_at DESC`, [topic])
+    }
     return Promise.all([articleQuery, commentQuery])
     .then(( arr ) => {
         const articles = arr[0].rows
         const comments = arr[1].rows
+
+        if(!articles.length) {
+            return Promise.reject(
+                ({status: 404, msg: 'Not Found'})
+            )
+        }
 
         articles.forEach((article) => {
             let commentCount = 0
