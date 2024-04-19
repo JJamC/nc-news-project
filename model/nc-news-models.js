@@ -30,37 +30,68 @@ function fetchArticle(article_id) {
     })
 }
 
-function fetchAllArticles(topic) {
-    
-    let articleQuery = db.query(`SELECT * FROM articles ORDER BY created_at DESC`)
-    const commentQuery = db.query(`SELECT * FROM comments`)
+function fetchAllArticles(topic, sort_by='created_at', order='DESC') {
 
-    if (topic) {
-        articleQuery = db.query(`SELECT * FROM articles WHERE topic=$1 ORDER BY created_at DESC`, [topic])
+    const queryVals = []
+
+    let sqlQuery = `SELECT
+    articles.article_id,
+    articles.title,
+    articles.topic,
+    articles.author,
+    articles.created_at,
+    articles.votes,
+    articles.article_img_url,
+    COUNT (comments.article_id)::INT AS comment_count
+    FROM articles
+    LEFT JOIN comments
+    ON articles.article_id = comments.article_id `
+
+    if(topic) {
+        sqlQuery += `WHERE topic=$1 `
+        queryVals.push(topic)
     }
-    return Promise.all([articleQuery, commentQuery])
-    .then(( arr ) => {
-        const articles = arr[0].rows
-        const comments = arr[1].rows
+    sqlQuery += `GROUP BY articles.article_id ORDER BY ${sort_by} ${order};`
 
-        if(!articles.length) {
-            return Promise.reject(
-                ({status: 404, msg: 'Not Found'})
-            )
-        }
-
-        articles.forEach((article) => {
-            let commentCount = 0
-            comments.forEach((comment => {
-                if(article.article_id === comment.article_id) {
-                    commentCount ++
-                }
-            }))
-            article.comment_count = commentCount
-            delete article.body
-        })
-        return articles
+    return db.query(sqlQuery, queryVals)
+    .then(({ rows }) => {
+       if (!rows.length) {
+        return Promise.reject(
+            ({status: 404, msg: 'Not Found'})
+        )
+       }
+        return rows
     })
+    
+    // let articleQuery = db.query(`SELECT * FROM articles ORDER BY created_at DESC`)
+    // const commentQuery = db.query(`SELECT * FROM comments`)
+
+    // if (topic) {
+    //     articleQuery = db.query(`SELECT * FROM articles WHERE topic=$1 ORDER BY created_at DESC`, [topic])
+    // }
+    // return Promise.all([articleQuery, commentQuery])
+    // .then(( arr ) => {
+    //     const articles = arr[0].rows
+    //     const comments = arr[1].rows
+
+    //     if(!articles.length) {
+    //         return Promise.reject(
+    //             ({status: 404, msg: 'Not Found'})
+    //         )
+    //     }
+
+    //     articles.forEach((article) => {
+    //         let commentCount = 0
+    //         comments.forEach((comment => {
+    //             if(article.article_id === comment.article_id) {
+    //                 commentCount ++
+    //             }
+    //         }))
+    //         article.comment_count = commentCount
+    //         delete article.body
+    //     })
+    //     return articles
+    // })
 }
 
 function fetchArticleComments(article_id) {

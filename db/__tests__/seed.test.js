@@ -261,6 +261,81 @@ test('GET 200: responds with array of all articles if passed an invalid query', 
         })
     })
 })
+test('GET 200: responds with array sorted by any column specified, sorted by default by created_at and descending', () => {
+    return request(app)
+    .get('/api/articles')
+    .expect(200)
+    .then(({ body }) => {
+        const { articles } = body
+        expect(articles.length).toBe(13)
+        expect(articles).toBeSortedBy('created_at', {descending:true})
+        articles.forEach((article) => {
+            expect(article).toMatchObject({
+                article_id: expect.any(Number),
+                title: expect.any(String),
+                topic: expect.any(String),
+                author: expect.any(String),
+                created_at: expect.any(String),
+                votes: expect.any(Number),
+                article_img_url: expect.any(String),
+                comment_count: expect.any(Number)
+            })
+        })
+    })
+})
+test('GET 200: responds with array which by default is sorted by created_at and ordered by descending', () => {
+    return request(app)
+    .get('/api/articles')
+    .expect(200)
+    .then(({ body }) => {
+        const { articles } = body
+        expect(articles.length).toBe(13)
+        expect(articles).toBeSortedBy('created_at', {descending:true})
+        articles.forEach((article) => {
+            expect(article).toMatchObject({
+                article_id: expect.any(Number),
+                title: expect.any(String),
+                topic: expect.any(String),
+                author: expect.any(String),
+                created_at: expect.any(String),
+                votes: expect.any(Number),
+                article_img_url: expect.any(String),
+                comment_count: expect.any(Number)
+            })
+        })
+    })
+})
+test('GET 200: responds with array sorted by any column specified and any order specified', () => {
+    return request(app)
+    .get('/api/articles?sort_by=comment_count&&order=ASC')
+    .expect(200)
+    .then(({ body }) => {
+        const { articles } = body
+        expect(articles.length).toBe(13)
+        expect(articles).toBeSortedBy('comment_count', {ascending:true})
+        articles.forEach((article) => {
+            expect(article).toMatchObject({
+                article_id: expect.any(Number),
+                title: expect.any(String),
+                topic: expect.any(String),
+                author: expect.any(String),
+                created_at: expect.any(String),
+                votes: expect.any(Number),
+                article_img_url: expect.any(String),
+                comment_count: expect.any(Number)
+            })
+        })
+    })
+})
+test('GET 400: responds with error if passed invalid column to sort by', () => {
+    return request(app)
+    .get('/api/articles?sort_by=cromment_crounts')
+    .expect(400)
+    .then(({ body }) => {
+        const { msg } = body
+       expect(msg).toBe('Bad Request')
+})
+})
 })
 
 describe('/api/articles/:article_id/comments', () => {
