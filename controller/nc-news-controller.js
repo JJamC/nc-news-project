@@ -6,8 +6,7 @@ const { fetchTopics,
         insertComment, 
         updateArticle, 
         deleteComment, 
-        fetchUsers,
-     } = require('../model/nc-news-models')
+        fetchUsers } = require('../model/nc-news-models')
 const endPoints = require('../endpoints.json')
 
 function sendEndpoints(req, res, next) {
@@ -29,10 +28,13 @@ function sendArticle(req , res, next) {
 
 function sendAllArticles(req, res, next) {
     const { topic } = req.query
-    return fetchAllArticles(topic).then((articles) =>{
+    const { sort_by } = req.query
+    const { order } = req.query
+    return fetchAllArticles(topic, sort_by, order).then((articles) =>{
         res.status(200).send( { articles } )
     }).catch(next)
-}
+    }
+
 
 function sendArticleComments(req, res, next) {
     const { article_id } = req.params
