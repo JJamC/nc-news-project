@@ -1,6 +1,15 @@
 const express = require('express')
 const app = express()
-const { sendTopics, sendEndpoints, sendArticle, sendAllArticles, sendArticleComments, postCommentById, patchArticle, sendDelete, sendUsers } = require('./controller/nc-news-controller')
+const {
+    sendTopics, 
+    sendEndpoints, 
+    sendArticle, 
+    sendAllArticles, 
+    sendArticleComments, 
+    postCommentById, 
+    patchArticle, 
+    sendDelete, 
+    sendUsers } = require('./controller/nc-news-controller')
 
 app.use(express.json())
 
@@ -25,9 +34,12 @@ app.delete('/api/comments/:comment_id', sendDelete)
 app.all('*', (req, res, next) => {
     res.status(404).send({ msg: 'Endpoint Not Found'})
 })
-
 app.use((err, req, res, next) => {
-    if (err.code === '23503' || err.code === '22P02') {
+
+    if (err.code === '23503') {
+        res.status(404).send({ msg: 'Not Found'})
+    }
+    if (err.code === '22P02') {
         res.status(400).send({ msg: 'Bad Request'})
     }
     next(err)

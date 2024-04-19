@@ -18,10 +18,10 @@ test('GET 200: response contains all topics', () => {
         const { topics } = body;
         expect(topics.length).toBe(3)
         topics.forEach((topic) => {
-            expect(topic).toMatchObject(expect.objectContaining({
+            expect(topic).toMatchObject({
                 description: expect.any(String),
                 slug: expect.any(String)
-            }))
+            })
         })
         })
  })
@@ -48,13 +48,34 @@ test('GET 200: responds with an object of endpoints"', () => {
 })
 
 describe('/api/articles/:article_id', () => {
-test('GET 200: responds with the article that matches the given article_id and comment_count of the number of comments with the given article_id', () => {
+test('GET 200: responds with the article that matches the given article_id', () => {
     return request(app)
     .get('/api/articles/1')
     .expect(200)
     .then(({ body }) => {
         const { article } = body
-            expect(article).toMatchObject(expect.objectContaining(
+            expect(article).toMatchObject(
+                {
+                    title: "Living in the shadow of a great man",
+                    topic: "mitch",
+                    author: "butter_bridge",
+                    body: "I find this existence challenging",
+                    created_at: expect.any(String), 
+                    votes: 100,
+                    article_img_url:
+                      "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+                  }
+                )
+    })
+})
+
+test('GET 200: responds with the article that matches the given article_id and a comment_count property', () => {
+    return request(app)
+    .get('/api/articles/1')
+    .expect(200)
+    .then(({ body }) => {
+        const { article } = body
+            expect(article).toMatchObject(
                 {
                     title: "Living in the shadow of a great man",
                     topic: "mitch",
@@ -67,9 +88,9 @@ test('GET 200: responds with the article that matches the given article_id and c
                     comment_count: 11
                   }
                 )
-            )
-        })
-        })  
+    })
+})
+    
 
 test('GET 404: responds with 404 error message if id does not exist', () => {
     return request(app)
@@ -96,7 +117,7 @@ test('PATCH 200: updates votes key of article by adding a positive integer and r
     .expect(200)
     .then(({ body }) => {
         const { article } = body
-            expect(article).toMatchObject(expect.objectContaining(
+            expect(article).toMatchObject(
                 {
                     title: "Living in the shadow of a great man",
                     topic: "mitch",
@@ -106,11 +127,9 @@ test('PATCH 200: updates votes key of article by adding a positive integer and r
                     votes: 101,
                     article_img_url:
                       "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
-                  }
-                )
-            )
-        })
-});
+                  })
+    })
+})
 test('PATCH 200: updates votes key of article by adding a negative integer and returns updated article', () => {
     return request(app)
     .patch('/api/articles/1')
@@ -118,7 +137,7 @@ test('PATCH 200: updates votes key of article by adding a negative integer and r
     .expect(200)
     .then(({ body }) => {
         const { article } = body
-            expect(article).toMatchObject(expect.objectContaining(
+            expect(article).toMatchObject((
                 {
                     title: "Living in the shadow of a great man",
                     topic: "mitch",
@@ -156,6 +175,7 @@ test('PATCH 400: returns error if article does not exist', () => {
 })
 })
 
+
 describe('/api/articles', () => {
 test('GET 200: responds with array of article objects', () => {
     return request(app)
@@ -165,7 +185,7 @@ test('GET 200: responds with array of article objects', () => {
         const { articles } = body
         expect(articles.length).toBe(13)
         articles.forEach((article) => {
-            expect(article).toMatchObject(expect.objectContaining({
+            expect(article).toMatchObject({
                 article_id: expect.any(Number),
                 title: expect.any(String),
                 topic: expect.any(String),
@@ -174,7 +194,7 @@ test('GET 200: responds with array of article objects', () => {
                 votes: expect.any(Number),
                 article_img_url: expect.any(String),
                 comment_count: expect.any(Number)
-            }))
+            })
         })
     })
 })
@@ -189,22 +209,22 @@ test('GET 200: responds with array of article objects in descending order', () =
 })
 test('GET 200: responds with array of article objects matching the topic query', () => {
     return request(app)
-    .get('/api/articles?topic=cats')
+    .get('/api/articles?topic=mitch')
     .expect(200)
     .then(({ body }) => {
         const { articles } = body
-        expect(articles.length).toBe(1)
+        expect(articles.length).toBe(12)
         articles.forEach((article) => {
             expect(article).toMatchObject(
                 {
                     article_id: expect.any(Number),
-                    title: "UNCOVERED: catspiracy to bring down democracy",
-                    topic: "cats",
-                    author: "rogersop",
+                    title: expect.any(String),
+                    topic: "mitch",
+                    author: expect.any(String),
                     created_at: expect.any(String),
                     votes: expect.any(Number),
                     article_img_url:
-                      "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+                    expect.any(String),
                     comment_count: expect.any(Number)
                   }
             )
@@ -228,7 +248,7 @@ test('GET 200: responds with array of all articles if passed an invalid query', 
         const { articles } = body
         expect(articles.length).toBe(13)
         articles.forEach((article) => {
-            expect(article).toMatchObject(expect.objectContaining({
+            expect(article).toMatchObject({
                 article_id: expect.any(Number),
                 title: expect.any(String),
                 topic: expect.any(String),
@@ -237,7 +257,7 @@ test('GET 200: responds with array of all articles if passed an invalid query', 
                 votes: expect.any(Number),
                 article_img_url: expect.any(String),
                 comment_count: expect.any(Number)
-            }))
+            })
         })
     })
 })
@@ -252,14 +272,14 @@ test('GET 200: responds with an array of comments for the given article_id', () 
     const { comments } = body
     expect(comments.length).toBe(11)
     comments.forEach((comment) => {
-        expect(comment).toMatchObject(expect.objectContaining({
+        expect(comment).toMatchObject({
             comment_id: expect.any(Number),
             votes: expect.any(Number),
             created_at: expect.any(String),
             author: expect.any(String),
             body: expect.any(String),
             article_id: 1
-            }))
+            })
         })
     })
 })
@@ -321,7 +341,7 @@ test('POST 201: responds with successful created message when post is successful
     })
     })
 })
-test('POST 400: responds with error message if passed a non-existent article id', () => {
+test('POST 404: responds with error message if article id not found', () => {
     const newComment = {
         username: "butter_bridge",
         body: "Whilst reading this article I suffered a great fall"
@@ -329,10 +349,10 @@ test('POST 400: responds with error message if passed a non-existent article id'
     return request(app)
     .post('/api/articles/5485/comments')
     .send(newComment)
-    .expect(400)
+    .expect(404)
     .then(({ body }) => {
         const { msg } = body
-        expect(msg).toBe('Bad Request')
+        expect(msg).toBe('Not Found')
 })
 });
 test('POST 400: responds with error message if passed an invalid article id', () => {
@@ -350,7 +370,7 @@ test('POST 400: responds with error message if passed an invalid article id', ()
 })
 });
 
-test('POST 400: responds with error message if passed an invalid username', () => {
+test('POST 404: responds with error message if username not found', () => {
     const newComment = {
         username: "nowhere_man",
         body: "Whilst reading this article I suffered a great fall"
@@ -358,10 +378,10 @@ test('POST 400: responds with error message if passed an invalid username', () =
     return request(app)
     .post('/api/articles/2/comments')
     .send(newComment)
-    .expect(400)
+    .expect(404)
     .then(({ body }) => {
         const { msg } = body
-        expect(msg).toBe('Bad Request')
+        expect(msg).toBe('Not Found')
 })
 });
 
@@ -377,6 +397,11 @@ test('DELETE 400: responds with error message when comment_id is invalid', () =>
     .delete('/api/comments/fdsa')
     .expect(400)
 })
+test('DELETE 400: responds with error message when comment_id is not found', () => {
+    return request(app)
+    .delete('/api/comments/1213')
+    .expect(404)
+})
 })
 describe('/api/users', () => {
 test('GET 200: responds with array of users', () => {
@@ -391,10 +416,9 @@ test('GET 200: responds with array of users', () => {
             username: expect.any(String),
             name: expect.any(String),
             avatar_url: expect.any(String)
-        }
-        )
+            })
+        })
     })
-})
 });
 
 })
