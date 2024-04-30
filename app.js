@@ -1,5 +1,6 @@
 const express = require('express')
 const app = express()
+const apiRouter = require('./router/routes/api-router')
 const { sendTopics, 
         sendEndpoints, 
         sendArticle, 
@@ -12,26 +13,12 @@ const { sendTopics,
 
 app.use(express.json())
 
+app.use('/api', apiRouter)
+
 app.get("/api", sendEndpoints)
 
-app.get("/api/topics", sendTopics)
-
-app.get('/api/articles', sendAllArticles)
-
-app.get('/api/users', sendUsers)
-
-app.get('/api/articles/:article_id', sendArticle)
-
-app.patch('/api/articles/:article_id', patchArticle)
-
-app.get('/api/articles/:article_id/comments', sendArticleComments)
-
-app.post('/api/articles/:article_id/comments', postCommentById)
-
-app.delete('/api/comments/:comment_id', sendDelete)
-
 app.all('*', (req, res, next) => {
-    res.status(404).send({ msg: 'Endpoint Not Found'})
+    res.status(404).send({ msg: 'Not Found'})
 })
 app.use((err, req, res, next) => {
 
