@@ -31,7 +31,7 @@ test('GET 404: responds with a 404 error message when user enters invalid endpoi
     .expect(404)
     .then(({ body }) => {
         const { msg } = body
-        expect(msg).toBe('Endpoint Not Found')
+        expect(msg).toBe('Not Found')
     })
 })
 });
