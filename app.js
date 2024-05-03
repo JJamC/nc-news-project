@@ -1,45 +1,46 @@
-const express = require('express')
-const app = express()
-const apiRouter = require('./router/routes/api-router')
-const { sendTopics, 
-        sendEndpoints, 
-        sendArticle, 
-        sendAllArticles, 
-        sendArticleComments, 
-        postCommentById, 
-        patchArticle, 
-        sendDelete, 
-        sendUsers } = require('./controller/nc-news-controller')
+const express = require("express");
+const app = express();
+const apiRouter = require("./router/routes/api-router");
+const {
+  sendTopics,
+  sendEndpoints,
+  sendArticle,
+  sendAllArticles,
+  sendArticleComments,
+  postCommentById,
+  patchArticle,
+  sendDelete,
+  sendUsers,
+} = require("./controller/nc-news-controller");
 
-app.use(express.json())
+app.use(express.json());
 
-app.use('/api', apiRouter)
+app.use("/api", apiRouter);
 
-app.get("/api", sendEndpoints)
+app.get("/api", sendEndpoints);
 
-app.all('*', (req, res, next) => {
-    res.status(404).send({ msg: 'Not Found'})
-})
+app.all("*", (req, res, next) => {
+  res.status(404).send({ msg: "Not Found" });
+});
 app.use((err, req, res, next) => {
-
-    if (err.code === '23503') {
-        res.status(404).send({ msg: 'Not Found'})
-    }
-    if (err.code === '22P02' || err.code === '42703') {
-        res.status(400).send({ msg: 'Bad Request'})
-    }
-    next(err)
-})
-
-app.use((err, req, res, next) => {
-    if(err.status && err.msg) {
-        res.status(err.status).send({ msg: err.msg})
-    }
-    next(err)
-})
+  if (err.code === "23503") {
+    res.status(404).send({ msg: "Not Found" });
+  }
+  if (err.code === "22P02" || err.code === "42703") {
+    res.status(400).send({ msg: "Bad Request" });
+  }
+  next(err);
+});
 
 app.use((err, req, res, next) => {
-    res.status(500).send({ msg: "internal server error"})
-})
+  if (err.status && err.msg) {
+    res.status(err.status).send({ msg: err.msg });
+  }
+  next(err);
+});
+
+app.use((err, req, res, next) => {
+  res.status(500).send({ msg: "internal server error" });
+});
 
 module.exports = app;

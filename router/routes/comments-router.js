@@ -3,5 +3,4 @@ const { sendDelete } = require("../../controller/nc-news-controller");
 
 commentsRouter.route("/:comment_id").delete(sendDelete);
 
-
 module.exports = commentsRouter;
