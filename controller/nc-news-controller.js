@@ -5,10 +5,12 @@ const {
   fetchArticleComments,
   checkArticleExists,
   insertComment,
+  updateComment,
   updateArticle,
   deleteComment,
   fetchUsers,
   fetchUserByUsername,
+  insertArticle
 } = require("../model/nc-news-models");
 const endPoints = require("../endpoints.json");
 
@@ -56,6 +58,18 @@ function sendArticleComments(req, res, next) {
     .catch(next);
 }
 
+function postArticle(req, res, next) {
+  const { author } = req.body
+  const { title } = req.body
+  const { body } = req.body
+  const { topic } = req.body
+  return insertArticle(author, title, body, topic)
+    .then((article) => {
+      res.status(201).send({ article });
+    })
+  .catch(next)
+}
+
 function postCommentById(req, res, next) {
   const { article_id } = req.params;
   const { body } = req;
@@ -63,6 +77,17 @@ function postCommentById(req, res, next) {
   return insertComment(article_id, body)
     .then((comment) => {
       res.status(201).send({ comment });
+    })
+    .catch(next);
+}
+
+function patchComment(req, res, next) {
+  const { comment_id } = req.params;
+  const { inc_votes } = req.body;
+
+  updateComment(inc_votes, comment_id)
+    .then((comment) => {
+      res.status(200).send({ comment });
     })
     .catch(next);
 }
@@ -112,8 +137,10 @@ module.exports = {
   sendAllArticles,
   sendArticleComments,
   postCommentById,
+  patchComment,
   patchArticle,
   sendDelete,
   sendUsers,
   sendUser,
+  postArticle
 };

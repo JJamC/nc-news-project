@@ -2,15 +2,7 @@ const express = require("express");
 const app = express();
 const apiRouter = require("./router/routes/api-router");
 const {
-  sendTopics,
   sendEndpoints,
-  sendArticle,
-  sendAllArticles,
-  sendArticleComments,
-  postCommentById,
-  patchArticle,
-  sendDelete,
-  sendUsers,
 } = require("./controller/nc-news-controller");
 
 app.use(express.json());

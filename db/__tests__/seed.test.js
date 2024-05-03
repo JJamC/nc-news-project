@@ -323,7 +323,46 @@ describe("/api/articles", () => {
         expect(msg).toBe("Bad Request");
       });
   });
-});
+  test("POST 201: responds with successful created message when article is successfully posted", () => {
+    const newArticle = {
+      author: "rogersop",
+      title: "cool things",
+      body: "really awesome cool things that are too cool for you",
+      topic: "cats",
+      article_img_ur: ""
+    }
+    return request(app)
+      .post("/api/articles")
+      .send(newArticle)
+      .expect(201)
+      .then(({ body }) => {
+        const { article } = body;
+        expect(article).toMatchObject({
+          author: "rogersop",
+          title: "cool things",
+          body: "really awesome cool things that are too cool for you",
+          topic: "cats",
+          article_id: 14,
+          votes: 0,
+          created_at: expect.any(String),
+          comment_count: 0
+        })
+      })
+  })
+  test("POST 400: responds with an error message if the new article is in an invalid format", () => {
+    const newArticle = {}
+    return request(app)
+      .post("/api/articles")
+      .send(newArticle)
+      .expect(400)
+      .then(({ body }) => {
+        const { msg } = body;
+        expect(msg).toBe("Bad Request")
+
+
+      })
+  });
+})
 
 describe("/api/articles/:article_id/comments", () => {
   test("GET 200: responds with an array of comments for the given article_id", () => {
@@ -457,7 +496,44 @@ describe("/api/comments/:comment_id", () => {
   test("DELETE 400: responds with error message when comment_id is not found", () => {
     return request(app).delete("/api/comments/1213").expect(404);
   });
-});
+  test("PATCH 200: updates votes key of comment by adding a positive and returns updated comment", () => {
+    return request(app)
+      .patch("/api/comments/1")
+      .send({ inc_votes: 1 })
+      .expect(200)
+      .then(({ body }) => {
+        const { comment } = body;
+        expect(comment).toMatchObject({
+          body: "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+          votes: 17,
+          author: "butter_bridge",
+          article_id: 9,
+          created_at: expect.any(String),
+        })
+      });
+  });
+})
+  test("PATCH 400: returns error given invalid body", () => {
+    return request(app)
+      .patch("/api/comments/1")
+      .send({})
+      .expect(400)
+      .then(({ body }) => {
+        const { msg } = body;
+        expect(msg).toBe("Bad Request");
+      });
+  });
+
+  test("PATCH 400: returns error if article does not exist", () => {
+    return request(app)
+      .patch("/api/comments/100")
+      .send({ inc_votes: 1 })
+      .expect(400)
+      .then(({ body }) => {
+        const { msg } = body;
+        expect(msg).toBe("Bad Request");
+      });
+  });
 describe("/api/users", () => {
   test("GET 200: responds with array of users", () => {
     return request(app)
@@ -489,6 +565,15 @@ describe("/api/users/:username", () => {
           avatar_url:
             "https://avatars2.githubusercontent.com/u/24394918?s=400&v=4",
         });
+      });
+  });
+  test("GET 404: responds with user selected by username", () => {
+    return request(app)
+      .get("/api/users/sgjdfk")
+      .expect(404)
+      .then(({ body }) => {
+        const { msg } = body;
+        expect(msg).toBe('Not Found');
       });
   });
 });

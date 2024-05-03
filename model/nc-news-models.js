@@ -57,7 +57,6 @@ function fetchAllArticles(topic, sort_by = "created_at", order = "DESC") {
     }
     return rows;
   });
-
 }
 
 function fetchArticleComments(article_id) {
@@ -86,6 +85,39 @@ function checkArticleExists(article_id) {
     });
 }
 
+function insertArticle(
+  author,
+  title,
+  body,
+  topic,
+  article_img_url = `https://m.media-amazon.com/images/I/41+gelS+89L.jpg`
+) {
+  if (!author || !title || !body || !topic) {
+        return Promise.reject({ status: 400, msg: "Bad Request" });
+  }
+  return db
+    .query(
+      `INSERT INTO articles(author, title, body, topic, article_img_url)
+    VALUES ($1, $2, $3, $4, $5)
+    RETURNING
+    articles.article_id,
+    articles.title,
+    articles.topic,
+    articles.author,
+    articles.body,
+    articles.created_at,
+    articles.votes,
+    articles.article_img_url,
+    (SELECT COUNT(*)
+    FROM comments
+    WHERE comments.article_id = articles.article_id)::INT AS comment_count;`,
+      [author, title, body, topic, article_img_url]
+    )
+    .then(({ rows }) => {
+      return rows[0];
+    });
+}
+
 function insertComment(article_id, body) {
   return db
     .query(
@@ -95,6 +127,27 @@ function insertComment(article_id, body) {
       [article_id, body.username, body.body]
     )
     .then(({ rows }) => {
+      return rows[0];
+    });
+}
+
+function updateComment(voteUpdate, comment_id) {
+  if (!voteUpdate) {
+    return Promise.reject({ status: 400, msg: "Bad Request" });
+  }
+  return db
+    .query(
+      `UPDATE comments
+    SET
+        votes= votes + $1
+        WHERE comment_id=$2
+        RETURNING *;`,
+      [voteUpdate, comment_id]
+    )
+    .then(({ rows }) => {
+      if (!rows.length) {
+        return Promise.reject({ status: 400, msg: "Bad Request" });
+      }
       return rows[0];
     });
 }
@@ -140,9 +193,14 @@ function fetchUsers() {
 }
 
 function fetchUserByUsername(username) {
-    return db.query(`SELECT * FROM users WHERE username=$1`, [username]).then(({ rows }) => {
-        return rows[0];
-    })
+  return db
+    .query(`SELECT * FROM users WHERE username=$1`, [username])
+    .then(({ rows }) => {
+      if (!rows.length) {
+        return Promise.reject({ status: 404, msg: "Not Found" });
+      }
+      return rows[0];
+    });
 }
 
 module.exports = {
@@ -152,8 +210,10 @@ module.exports = {
   fetchArticleComments,
   checkArticleExists,
   insertComment,
+  updateComment,
   updateArticle,
   deleteComment,
   fetchUsers,
-  fetchUserByUsername
+  fetchUserByUsername,
+  insertArticle,
 };

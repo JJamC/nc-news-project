@@ -7,9 +7,10 @@ const {
   sendArticleComments,
   postCommentById,
   sendDelete,
+  postArticle
 } = require("../../controller/nc-news-controller");
 
-articlesRouter.route("/").get(sendAllArticles);
+articlesRouter.route("/").get(sendAllArticles).post(postArticle)
 articlesRouter.route("/:article_id").get(sendArticle).patch(patchArticle);
 
 articlesRouter
