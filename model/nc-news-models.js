@@ -67,7 +67,6 @@ function fetchAllArticles(
 
 function fetchArticleComments(article_id, limit = 10, p = 1) {
   const offset = (p - 1) * limit;
-  console.log(limit);
 
   return db
     .query(
