@@ -10,7 +10,7 @@ const {
   deleteComment,
   fetchUsers,
   fetchUserByUsername,
-  insertArticle
+  insertArticle,
 } = require("../model/nc-news-models");
 const endPoints = require("../endpoints.json");
 
@@ -39,7 +39,9 @@ function sendAllArticles(req, res, next) {
   const { topic } = req.query;
   const { sort_by } = req.query;
   const { order } = req.query;
-  return fetchAllArticles(topic, sort_by, order)
+  const { limit } = req.query;
+  const { p } = req.query;
+  return fetchAllArticles(topic, sort_by, order, limit, p)
     .then((articles) => {
       res.status(200).send({ articles });
     })
@@ -48,8 +50,11 @@ function sendAllArticles(req, res, next) {
 
 function sendArticleComments(req, res, next) {
   const { article_id } = req.params;
+  const { limit } = req.query;
+  const { p } = req.query;
+
   Promise.all([
-    fetchArticleComments(article_id),
+    fetchArticleComments(article_id, limit, p),
     checkArticleExists(article_id),
   ])
     .then((arr) => {
@@ -59,15 +64,15 @@ function sendArticleComments(req, res, next) {
 }
 
 function postArticle(req, res, next) {
-  const { author } = req.body
-  const { title } = req.body
-  const { body } = req.body
-  const { topic } = req.body
+  const { author } = req.body;
+  const { title } = req.body;
+  const { body } = req.body;
+  const { topic } = req.body;
   return insertArticle(author, title, body, topic)
     .then((article) => {
       res.status(201).send({ article });
     })
-  .catch(next)
+    .catch(next);
 }
 
 function postCommentById(req, res, next) {
@@ -124,7 +129,7 @@ function sendUsers(req, res, next) {
 function sendUser(req, res, next) {
   const { username } = req.params;
   fetchUserByUsername(username)
-      .then((user) => {
+    .then((user) => {
       res.status(200).send({ user });
     })
     .catch(next);
@@ -142,5 +147,5 @@ module.exports = {
   sendDelete,
   sendUsers,
   sendUser,
-  postArticle
+  postArticle,
 };
