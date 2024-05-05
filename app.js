@@ -1,9 +1,12 @@
 const express = require("express");
 const app = express();
+const cors = require('cors')
 const apiRouter = require("./router/routes/api-router");
 const {
   sendEndpoints,
 } = require("./controller/nc-news-controller");
+
+app.use(cors())
 
 app.use(express.json());
 
