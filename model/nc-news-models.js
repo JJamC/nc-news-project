@@ -28,8 +28,13 @@ function fetchArticle(article_id) {
       return rows[0];
     });
 }
-
-function fetchAllArticles(topic, sort_by = "created_at", order = "DESC") {
+function fetchAllArticles(
+  topic,
+  sort_by = "created_at",
+  order = "DESC",
+  limit = 10,
+  p = 1
+) {
   const queryVals = [];
 
   let sqlQuery = `SELECT
@@ -49,7 +54,8 @@ function fetchAllArticles(topic, sort_by = "created_at", order = "DESC") {
     sqlQuery += `WHERE topic=$1 `;
     queryVals.push(topic);
   }
-  sqlQuery += `GROUP BY articles.article_id ORDER BY ${sort_by} ${order};`;
+  const offset = (p - 1) * limit;
+  sqlQuery += `GROUP BY articles.article_id ORDER BY ${sort_by} ${order} OFFSET ${offset} ROWS FETCH NEXT ${limit} ROWS ONLY;`;
 
   return db.query(sqlQuery, queryVals).then(({ rows }) => {
     if (!rows.length) {
@@ -59,10 +65,12 @@ function fetchAllArticles(topic, sort_by = "created_at", order = "DESC") {
   });
 }
 
-function fetchArticleComments(article_id) {
+function fetchArticleComments(article_id, limit = 10, p = 1) {
+  const offset = (p - 1) * limit;
+
   return db
     .query(
-      `SELECT * FROM comments WHERE article_id=$1 ORDER BY created_at DESC`,
+      `SELECT * FROM comments WHERE article_id=$1 ORDER BY created_at DESC OFFSET ${offset} ROWS FETCH NEXT ${limit} ROWS ONLY;`,
       [article_id]
     )
     .then(({ rows }) => {
@@ -93,7 +101,7 @@ function insertArticle(
   article_img_url = `https://m.media-amazon.com/images/I/41+gelS+89L.jpg`
 ) {
   if (!author || !title || !body || !topic) {
-        return Promise.reject({ status: 400, msg: "Bad Request" });
+    return Promise.reject({ status: 400, msg: "Bad Request" });
   }
   return db
     .query(

@@ -173,7 +173,7 @@ describe("/api/articles", () => {
       .expect(200)
       .then(({ body }) => {
         const { articles } = body;
-        expect(articles.length).toBe(13);
+        expect(articles.length).toBe(10);
         articles.forEach((article) => {
           expect(article).toMatchObject({
             article_id: expect.any(Number),
@@ -203,7 +203,7 @@ describe("/api/articles", () => {
       .expect(200)
       .then(({ body }) => {
         const { articles } = body;
-        expect(articles.length).toBe(12);
+        expect(articles.length).toBe(10);
         articles.forEach((article) => {
           expect(article).toMatchObject({
             article_id: expect.any(Number),
@@ -233,7 +233,7 @@ describe("/api/articles", () => {
       .expect(200)
       .then(({ body }) => {
         const { articles } = body;
-        expect(articles.length).toBe(13);
+        expect(articles.length).toBe(10);
         articles.forEach((article) => {
           expect(article).toMatchObject({
             article_id: expect.any(Number),
@@ -254,7 +254,7 @@ describe("/api/articles", () => {
       .expect(200)
       .then(({ body }) => {
         const { articles } = body;
-        expect(articles.length).toBe(13);
+        expect(articles.length).toBe(10);
         expect(articles).toBeSortedBy("created_at", { descending: true });
         articles.forEach((article) => {
           expect(article).toMatchObject({
@@ -276,7 +276,7 @@ describe("/api/articles", () => {
       .expect(200)
       .then(({ body }) => {
         const { articles } = body;
-        expect(articles.length).toBe(13);
+        expect(articles.length).toBe(10);
         expect(articles).toBeSortedBy("created_at", { descending: true });
         articles.forEach((article) => {
           expect(article).toMatchObject({
@@ -298,7 +298,7 @@ describe("/api/articles", () => {
       .expect(200)
       .then(({ body }) => {
         const { articles } = body;
-        expect(articles.length).toBe(13);
+        expect(articles.length).toBe(10);
         expect(articles).toBeSortedBy("comment_count", { ascending: true });
         articles.forEach((article) => {
           expect(article).toMatchObject({
@@ -314,6 +314,25 @@ describe("/api/articles", () => {
         });
       });
   });
+  test("GET 200: returns array of articles with length where limit and p queries have default of 10 and 1 respectively", () => {
+    return request(app)
+      .get("/api/articles?limit=10&&p=1")
+      .expect(200)
+      .then(({ body }) => {
+        const { articles } = body;
+        expect(articles.length).toBe(10);
+      });
+  });
+  test("GET 200: returns array of articles with length where limit and p queries differ from default values", () => {
+    return request(app)
+      .get("/api/articles?limit=5&&p=2")
+      .expect(200)
+      .then(({ body }) => {
+        const { articles } = body;
+        expect(articles.length).toBe(5);
+      });
+  });
+
   test("GET 400: responds with error if passed invalid column to sort by", () => {
     return request(app)
       .get("/api/articles?sort_by=cromment_crounts")
@@ -329,8 +348,8 @@ describe("/api/articles", () => {
       title: "cool things",
       body: "really awesome cool things that are too cool for you",
       topic: "cats",
-      article_img_ur: ""
-    }
+      article_img_ur: "",
+    };
     return request(app)
       .post("/api/articles")
       .send(newArticle)
@@ -345,25 +364,22 @@ describe("/api/articles", () => {
           article_id: 14,
           votes: 0,
           created_at: expect.any(String),
-          comment_count: 0
-        })
-      })
-  })
+          comment_count: 0,
+        });
+      });
+  });
   test("POST 400: responds with an error message if the new article is in an invalid format", () => {
-    const newArticle = {}
+    const newArticle = {};
     return request(app)
       .post("/api/articles")
       .send(newArticle)
       .expect(400)
       .then(({ body }) => {
         const { msg } = body;
-        expect(msg).toBe("Bad Request")
-
-
-      })
+        expect(msg).toBe("Bad Request");
+      });
   });
-})
-
+});
 describe("/api/articles/:article_id/comments", () => {
   test("GET 200: responds with an array of comments for the given article_id", () => {
     return request(app)
@@ -371,7 +387,7 @@ describe("/api/articles/:article_id/comments", () => {
       .expect(200)
       .then(({ body }) => {
         const { comments } = body;
-        expect(comments.length).toBe(11);
+        expect(comments.length).toBe(10);
         comments.forEach((comment) => {
           expect(comment).toMatchObject({
             comment_id: expect.any(Number),
@@ -402,6 +418,24 @@ describe("/api/articles/:article_id/comments", () => {
         expect(comments.length).toBe(0);
       });
   });
+  test("GET 200: returns array of comments with length where limit and p queries have default of 10 and 1 respectively", () => {
+    return request(app)
+      .get("/api/articles/1/comments?limit=10&&p=1")
+      .expect(200)
+      .then(({ body }) => {
+        const { comments } = body;
+        expect(comments.length).toBe(10);
+      });
+  });
+  test("GET 200: returns array of comments with length where limit and p queries differ from default values", () => {
+    return request(app)
+      .get("/api/articles/1/comments?limit=5&&p=2")
+      .expect(200)
+      .then(({ body }) => {
+        const { comments } = body;
+        expect(comments.length).toBe(5);
+      });
+  });
   test("GET 404: responds with error message if article_id is not found", () => {
     return request(app)
       .get("/api/articles/437/comments")
@@ -420,6 +454,7 @@ describe("/api/articles/:article_id/comments", () => {
         expect(msg).toBe("Bad Request");
       });
   });
+
   test("POST 201: responds with successful created message when post is successfully made", () => {
     const newComment = {
       username: "butter_bridge",
@@ -509,31 +544,31 @@ describe("/api/comments/:comment_id", () => {
           author: "butter_bridge",
           article_id: 9,
           created_at: expect.any(String),
-        })
+        });
       });
   });
-})
-  test("PATCH 400: returns error given invalid body", () => {
-    return request(app)
-      .patch("/api/comments/1")
-      .send({})
-      .expect(400)
-      .then(({ body }) => {
-        const { msg } = body;
-        expect(msg).toBe("Bad Request");
-      });
-  });
+});
+test("PATCH 400: returns error given invalid body", () => {
+  return request(app)
+    .patch("/api/comments/1")
+    .send({})
+    .expect(400)
+    .then(({ body }) => {
+      const { msg } = body;
+      expect(msg).toBe("Bad Request");
+    });
+});
 
-  test("PATCH 400: returns error if article does not exist", () => {
-    return request(app)
-      .patch("/api/comments/100")
-      .send({ inc_votes: 1 })
-      .expect(400)
-      .then(({ body }) => {
-        const { msg } = body;
-        expect(msg).toBe("Bad Request");
-      });
-  });
+test("PATCH 400: returns error if article does not exist", () => {
+  return request(app)
+    .patch("/api/comments/100")
+    .send({ inc_votes: 1 })
+    .expect(400)
+    .then(({ body }) => {
+      const { msg } = body;
+      expect(msg).toBe("Bad Request");
+    });
+});
 describe("/api/users", () => {
   test("GET 200: responds with array of users", () => {
     return request(app)
@@ -573,7 +608,7 @@ describe("/api/users/:username", () => {
       .expect(404)
       .then(({ body }) => {
         const { msg } = body;
-        expect(msg).toBe('Not Found');
+        expect(msg).toBe("Not Found");
       });
   });
 });
