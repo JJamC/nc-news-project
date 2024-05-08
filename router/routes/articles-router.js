@@ -6,7 +6,6 @@ const {
   patchArticle,
   sendArticleComments,
   postCommentById,
-  sendDelete,
   postArticle
 } = require("../../controller/nc-news-controller");
 
